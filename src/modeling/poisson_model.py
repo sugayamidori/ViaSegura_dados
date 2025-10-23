@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import PoissonRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_poisson_deviance
+from utils import add_cyclic_features
 
 def train_poisson(df):
     agg_df = df.groupby(['h3_cell', 'Data']).agg(
@@ -12,10 +13,7 @@ def train_poisson(df):
         holiday=('holiday', 'max')
     ).reset_index()
 
-    agg_df['dow_sin'] = np.sin(2 * np.pi * agg_df['day_of_week'] / 7)
-    agg_df['dow_cos'] = np.cos(2 * np.pi * agg_df['day_of_week'] / 7)
-    agg_df['month_sin'] = np.sin(2 * np.pi * agg_df['month'] / 12)
-    agg_df['month_cos'] = np.cos(2 * np.pi * agg_df['month'] / 12)
+    agg_df = add_cyclic_features(agg_df)
 
     X = agg_df[['dow_sin', 'dow_cos', 'month_sin', 'month_cos', 'holiday']]
     y = agg_df['sinistros']
