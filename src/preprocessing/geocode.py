@@ -23,4 +23,10 @@ def apply_geocoding(df):
     )
 
     df = df.merge(coords_df, on="address_to_geocode", how="left")
+    with_coords = df['latitude'].notna().sum()
+    without_coords = df['latitude'].isna().sum()
+
+    print(f"With coordinates: {with_coords:,}")
+    print(f"Without coordinates: {without_coords:,}")
+    
     return df
