@@ -92,30 +92,29 @@ def prepare_processed_dataset():
     
     df.to_csv(PROCESSED_DATASET_PATH, index=False)
     
-    print("DATASET PROCESSADO E SALVO COM SUCESSO!")
+    print("DATASET PROCESSED AND SAVED")
    
-    print(f"Arquivo: {PROCESSED_DATASET_PATH}")
-    print(f"Registros: {len(df):,}")
-    print(f"Colunas: {len(df.columns)}")
+    print(f"File: {PROCESSED_DATASET_PATH}")
+    print(f"Records: {len(df):,}")
+    print(f"Columns: {len(df.columns)}")
     
     # Estatísticas de qualidade
-    print(f"\nQualidade dos Dados:")
+    print(f"\Data Quality:")
     if 'latitude' in df.columns and 'longitude' in df.columns:
         coords_ok = df[['latitude', 'longitude']].notna().all(axis=1).sum()
-        print(f"  Coordenadas: {coords_ok:,} ({coords_ok/len(df)*100:.1f}%)")
+        print(f"  Coordenates: {coords_ok:,} ({coords_ok/len(df)*100:.1f}%)")
     if 'h3_cell' in df.columns:
         h3_ok = df['h3_cell'].notna().sum()
         print(f"  H3 cells: {h3_ok:,} ({h3_ok/len(df)*100:.1f}%)")
     
-    # Preview das colunas importantes
-    print(f"\nColunas Principais:")
+    print(f"\nMain Columns:")
     important_cols = ['Data', 'hora', 'latitude', 'longitude', 'h3_cell', 
                       'year', 'month', 'day_of_week', 'weekend', 'holiday',
                       'bairro', 'endereco', 'tipo']
     available = [c for c in important_cols if c in df.columns]
-    print(f"  Disponíveis: {', '.join(available[:10])}")
+    print(f"  Available: {', '.join(available[:10])}")
     if len(available) > 10:
-        print(f"  ... e mais {len(available)-10} colunas")
+        print(f"  ... and {len(available)-10} columns")
     
     
     return df

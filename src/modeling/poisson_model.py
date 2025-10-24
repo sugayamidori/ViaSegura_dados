@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import PoissonRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_poisson_deviance
-from utils import add_cyclic_features
+from src.utils import add_cyclic_features
 
 def train_poisson(df):
     agg_df = df.groupby(['h3_cell', 'Data']).agg(
