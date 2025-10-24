@@ -18,6 +18,7 @@ from src.config.config import (
 from src.modeling.lgb_model import train_lgb_model
 from src.utils import add_cyclic_features
 
+from src.modeling.poisson_model import train_poisson
 
 def add_historical_features(df_weekly: pd.DataFrame) -> pd.DataFrame:
     df = df_weekly.sort_values(['h3_cell', 'week_start']).copy()
@@ -171,6 +172,17 @@ def main():
     print("\n[1/4] Loading processed dataset...")
     df = pd.read_csv(PROCESSED_DATASET_PATH, low_memory=False)
 
+    print("\n[EXTRA] Training baseline Poisson model...")
+    try:
+        poisson_results = train_poisson(df.copy()) # Usa uma cópia para não alterar o df original
+        print("  -> Poisson Model Metrics (on training data):")
+        metrics = poisson_results['metrics']
+        print(f"     - MAE: {metrics['MAE']:.4f}")
+        print(f"     - RMSE: {metrics['RMSE']:.4f}")
+        print(f"     - Poisson Deviance: {metrics['Poisson Deviance']:.4f}")
+    except Exception as e:
+        print(f"  -> Failed to train Poisson model. Error: {e}")
+
     # 2. Weekly aggregation
     print("\n[2/4] Aggregating by week and H3 cell...")
     df_weekly = aggregate_weekly_by_h3(
@@ -199,6 +211,13 @@ def main():
 
     train_data = lgb.Dataset(X, label=y, feature_name=available_features)
     model = lgb.train(params, train_data, num_boost_round=N_BOOST_ROUNDS)
+    results = train_lgb_model(X, y, available_features)  
+
+    avg_mae = np.mean([r['mae'] for r in results])
+    avg_rmse = np.mean([r['rmse'] for r in results])
+    avg_deviance = np.mean([r['poisson_deviance'] for r in results])
+
+    print(f"\n✅ LightGBM CV Results → MAE: {avg_mae:.4f} | RMSE: {avg_rmse:.4f} | Poisson Deviance: {avg_deviance:.4f}")
 
     # Save model
     export_dir = Path(BACKEND_EXPORT_DIR)
