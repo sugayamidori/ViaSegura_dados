@@ -18,6 +18,7 @@ def train_and_export_model(df_weekly, feature_cols, target_col='num_sinistros'):
     """
     TRAINING MODEL WITH GPU AND TIME SERIES SPLIT
     """
+    os.makedirs(BACKEND_EXPORT_DIR, exist_ok=True)
     
     X = df_weekly[feature_cols].copy()
     y = df_weekly[target_col].copy()
